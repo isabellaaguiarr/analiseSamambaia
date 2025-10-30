@@ -178,7 +178,10 @@ def geocodificar_nominatim(endereco):
     try:
         resposta = requests.get(url, params=params, headers=headers).json()
         if resposta:
-            return float(resposta[0]["lat"]), float(resposta[0]["lon"])
+            lat = float(resposta[0]["lat"])
+            lon = float(resposta[0]["lon"])
+            print(f"Coordenadas consumidas com sucesso: {endereco}")
+            return lat, lon
     except Exception as e:
         print(f"Erro ao geocodificar {endereco}: {e}")
     return None, None
