@@ -53,6 +53,6 @@ Extrair dados de imóveis do site [DF Imóveis](https://www.dfimoveis.com.br), g
 ---
 
 ## Colaboradores
-Isabella Aguiar   ()
+Isabella Aguiar   (https://github.com/isabellaaguiarr)
 
 Liz de Albuquerque ()

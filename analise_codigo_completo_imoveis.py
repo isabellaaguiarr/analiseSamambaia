@@ -31,6 +31,7 @@ opcao_cidade = "SAMAMBAIA"
 # opcao_bairro = "TODOS"
 # opcao_quarto = "QUARTO (TODOS)"
 
+
 # Compra ou venda 
 xpath = "/html/body/main/section[1]/div[1]/div[1]/form/div[1]/span[1]/span[1]/span"
 element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
@@ -206,8 +207,8 @@ df_localizados["distancia_metro_km"] = df_localizados.apply(
 )
 
 # Salvando em csv
-df_localizados.to_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dados/imoveis_samambaia_coordenadas.csv", index=False, encoding="utf-8")
-# df_localizados = pd.read_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dados/imoveis_samambaia_coordenadas.csv")
+# df_localizados.to_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dados/imoveis_samambaia_coordenadas.csv", index=False, encoding="utf-8")
+df_localizados = pd.read_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dados/imoveis_samambaia_coordenadas.csv")
 
 # PARTE 4 - Limpeza de dados
 # 1. Definindo as colunas relevantes para analise
@@ -235,19 +236,39 @@ df_limpo = df_limpo[
     (df_limpo["quartos"].fillna(0) <= 5)
 ].copy()
 
-# # 7. Transformacoes logaritmicas
-# 7.1 Convertendo distancia de km para metros
+# PARTE 5 - Transformacoes logaritmicas
+# 1 Convertendo distancia de km para metros
 df_limpo["distancia_metro_m"] = df_limpo["distancia_metro_km"] * 1000
 
-# 7.2 Aplicando logaritmo natural (ln(1 + x)) na distancia em metros e no preco
+# 1.1 Aplicando logaritmo natural (ln(1 + x)) na distancia em metros e no preco
 df_limpo["ln_distancia_metro"] = np.log1p(df_limpo["distancia_metro_m"])
 df_limpo["ln_preco"] = np.log1p(df_limpo["preco"])
 
-# 7.3 Removendo infinitos e NaN gerados pelo ln
+# 1.2 Removendo infinitos e NaN gerados pelo ln
 df_limpo = df_limpo.replace([np.inf, -np.inf], np.nan).dropna()
 
-# PARTE 5 – Analises e visualizacoes
-# 1. Regressao linear multipla
+# PARTE 6 – Analises e visualizacoes
+# 1. Histograma da Distribuicao de Precos dos Imoveis
+print("\nGerando Histograma: Distribuição de Preços dos Imóveis...")
+plt.figure(figsize=(10, 6))
+sns.histplot(data=df_limpo, x='preco', bins=30, kde=True, color='ForestGreen')
+plt.title('Distribuição de Preços dos Imóveis em Samambaia')
+plt.xlabel('Preço do Imóvel (R$)')
+plt.ylabel('Contagem')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# 2. Boxplot por Faixas de Distancia
+df_limpo["faixa_distancia"] = pd.cut(df_limpo["distancia_metro_km"], bins=[0, 0.5, 1, 2, 5], labels=["<500m", "500m–1km", "1–2km", "2–5km"])
+sns.boxplot(data=df_limpo, x="faixa_distancia", y="preco", color='ForestGreen')
+plt.title("Distribuição de preços por faixa de distância ao metrô")
+plt.xlabel("Faixa de distância ao metrô")
+plt.ylabel("Preço do imóvel (R$)")
+plt.grid(True)
+plt.show()
+
+# 3. Regressao linear multipla
 X = df_limpo[["metragem", "quartos", "ln_distancia_metro"]]
 y = df_limpo["ln_preco"]
 X_const = sm.add_constant(X)
@@ -255,7 +276,7 @@ modelo_multiplo = sm.OLS(y, X_const).fit()
 print("Regressão linear múltipla:")
 print(modelo_multiplo.summary())
 
-# 1.1 Regressao linear multipla (Multicolinearidade)
+# 3.1 Regressao linear multipla (Multicolinearidade)
 # Calcula o VIF para cada variavel 
 X_vif = sm.add_constant(df_limpo[["metragem", "quartos", "ln_distancia_metro"]])
 vif = pd.DataFrame()
@@ -264,10 +285,26 @@ vif["VIF"] = [variance_inflation_factor(X_vif.values, i) for i in range(X_vif.sh
 print("Fatores de inflação de variância (VIF):")
 print(vif)
 
-# 2. Outros graficos 
+# 4. Grafico de Importancia das Variaveis
+## Coeficientes do modelo (tirados da regressao/coef)
+coeficientes = {
+    "metragem": abs(0.0059),
+    "quartos": abs(0.1808),
+    "ln_distancia_metro": abs(0.0039)
+}
 
+## Criando um df ordenado
+df_importancia = pd.DataFrame.from_dict(coeficientes, orient='index', columns=['Importância'])
+df_importancia = df_importancia.sort_values(by='Importância', ascending=False)
 
-
-
+## plotando o grafico
+plt.figure(figsize=(8, 5))
+sns.barplot(x=df_importancia.values.flatten(), y=df_importancia.index, palette="viridis")
+plt.title("Importância das Variáveis na Regressão Linear Múltipla")
+plt.xlabel("Magnitude do Coeficiente (Impacto no ln_preco)")
+plt.ylabel("Variável")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
 
 
