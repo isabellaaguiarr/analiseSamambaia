@@ -288,26 +288,26 @@ vif["VIF"] = [variance_inflation_factor(X_vif.values, i) for i in range(X_vif.sh
 print("Fatores de inflação de variância (VIF):")
 print(vif)
 
-# 4. Grafico de Importancia das Variaveis
-## Coeficientes do modelo (tirados da regressao/coef)
-coeficientes = {
-    "metragem": abs(0.0059),
-    "quartos": abs(0.1808),
-    "ln_distancia_metro": abs(0.0039)
-}
+# # 4. Grafico de Importancia das Variaveis
+# ## Coeficientes do modelo (tirados da regressao/coef)
+# coeficientes = {
+#     "metragem": abs(0.0059),
+#     "quartos": abs(0.1808),
+#     "ln_distancia_metro": abs(0.0039)
+# }
 
-## Criando um df ordenado
-df_importancia = pd.DataFrame.from_dict(coeficientes, orient='index', columns=['Importância'])
-df_importancia = df_importancia.sort_values(by='Importância', ascending=False)
+# ## Criando um df ordenado
+# df_importancia = pd.DataFrame.from_dict(coeficientes, orient='index', columns=['Importância'])
+# df_importancia = df_importancia.sort_values(by='Importância', ascending=False)
 
-## plotando o grafico
-plt.figure(figsize=(8, 5))
-sns.barplot(x=df_importancia.values.flatten(), y=df_importancia.index, palette="viridis")
-plt.title("Importância das Variáveis na Regressão Linear Múltipla")
-plt.xlabel("Magnitude do Coeficiente (Impacto no ln_preco)")
-plt.ylabel("Variável")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+# ## plotando o grafico
+# plt.figure(figsize=(8, 5))
+# sns.barplot(x=df_importancia.values.flatten(), y=df_importancia.index, palette="viridis")
+# plt.title("Importância das Variáveis na Regressão Linear Múltipla")
+# plt.xlabel("Magnitude do Coeficiente (Impacto no ln_preco)")
+# plt.ylabel("Variável")
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
 
 
