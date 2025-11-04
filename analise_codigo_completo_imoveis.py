@@ -243,12 +243,6 @@ limite_inf = precos.quantile(0.25) - 1.5 * iqr
 limite_sup = precos.quantile(0.75) + 1.5 * iqr
 df_limpo = df_limpo[precos.between(limite_inf, limite_sup)]
 
-# 4. Removendo imoveis com preco acima de R$ 3 milhoes ou mais de 5 quartos
-df_limpo = df_limpo[
-    (df_limpo["preco"] <= 3000000) & 
-    (df_limpo["quartos"].fillna(0) <= 5)
-].copy()
-
 # PARTE 5 - Transformacoes logaritmicas
 # 1 Convertendo distancia de km para metros
 df_limpo["distancia_metro_m"] = df_limpo["distancia_metro_km"] * 1000
@@ -256,9 +250,6 @@ df_limpo["distancia_metro_m"] = df_limpo["distancia_metro_km"] * 1000
 # 1.1 Aplicando logaritmo natural (ln(1 + x)) na distancia em metros e no preco
 df_limpo["ln_distancia_metro"] = np.log1p(df_limpo["distancia_metro_m"])
 df_limpo["ln_preco"] = np.log1p(df_limpo["preco"])
-
-# 1.2 Removendo infinitos e NaN gerados pelo ln
-df_limpo = df_limpo.replace([np.inf, -np.inf], np.nan).dropna()
 
 # PARTE 6 – Analises e visualizacoes
 # 1. Histograma da Distribuicao de Precos dos Imoveis
@@ -272,13 +263,24 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-# 2. Boxplot por Faixas de Distancia
+# 2. Boxplot por Faixas de Distancia 
 df_limpo["faixa_distancia"] = pd.cut(df_limpo["distancia_metro_km"], bins=[0, 0.5, 1, 2, 5], labels=["<500m", "500m–1km", "1–2km", "2–5km"])
 sns.boxplot(data=df_limpo, x="faixa_distancia", y="preco", color='ForestGreen')
 plt.title("Distribuição de preços por faixa de distância ao metrô")
 plt.xlabel("Faixa de distância ao metrô")
 plt.ylabel("Preço do imóvel (R$)")
 plt.grid(True)
+plt.show()
+
+# 4. Grafico de Barras sobre preco medio por faixa de distancia
+preco_medio_faixa = df_limpo.groupby("faixa_distancia")["preco"].mean().reset_index()
+plt.figure(figsize=(8, 6))
+sns.barplot(data=preco_medio_faixa, x="faixa_distancia", y="preco", palette="crest")
+plt.title("Preço médio dos imóveis por faixa de distância ao metrô")
+plt.xlabel("Faixa de distância ao metrô")
+plt.ylabel("Preço médio do imóvel (R$)")
+plt.grid(axis="y", alpha=0.7)
+plt.tight_layout()
 plt.show()
 
 # 3. Regressao linear multipla
