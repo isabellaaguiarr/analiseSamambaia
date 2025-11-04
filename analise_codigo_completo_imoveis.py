@@ -137,7 +137,7 @@ df = pd.DataFrame(lst_imoveis)
 # Trasformando vaga em booleano 
 df['vaga'] = df['vaga'].str.contains(r'\b1\s*VAGA\b|\bVAGA\b', flags=re.IGNORECASE, regex=True).astype(int)
 
-# Convertendo o preço para numero
+# Convertendo o preco para numero
 df["preco"] = pd.to_numeric(
     df["preco"].str.extract(r"(\d[\d\.,]*)")[0].str.replace(".", "").str.replace(",", "")
 )
