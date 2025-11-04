@@ -272,7 +272,7 @@ plt.ylabel("Preço do imóvel (R$)")
 plt.grid(True)
 plt.show()
 
-# 4. Grafico de Barras sobre preco medio por faixa de distancia
+# 3. Grafico de Barras sobre preco medio por faixa de distancia
 preco_medio_faixa = df_limpo.groupby("faixa_distancia")["preco"].mean().reset_index()
 plt.figure(figsize=(8, 6))
 sns.barplot(data=preco_medio_faixa, x="faixa_distancia", y="preco", palette="crest")
@@ -283,7 +283,7 @@ plt.grid(axis="y", alpha=0.7)
 plt.tight_layout()
 plt.show()
 
-# 3. Regressao linear multipla
+# 4. Regressao linear multipla
 X = df_limpo[["metragem", "quartos", "vaga", "ln_distancia_metro"]]
 y = df_limpo["ln_preco"]
 X_const = sm.add_constant(X)
@@ -291,7 +291,7 @@ modelo_multiplo = sm.OLS(y, X_const).fit()
 print("Regressão linear múltipla:")
 print(modelo_multiplo.summary())
 
-# 3.1 Regressao linear multipla (Multicolinearidade)
+# 4.1 Regressao linear multipla (Multicolinearidade)
 # Calcula o VIF para cada variavel 
 X_vif = sm.add_constant(df_limpo[["metragem", "quartos", "vaga", "ln_distancia_metro"]])
 vif = pd.DataFrame()
@@ -300,7 +300,7 @@ vif["VIF"] = [variance_inflation_factor(X_vif.values, i) for i in range(X_vif.sh
 print("Fatores de inflação de variância (VIF):")
 print(vif)
 
-# # 4. Grafico de Importancia das Variaveis
+# # 5. Grafico de Importancia das Variaveis
 # ## Coeficientes do modelo (tirados da regressao/coef)
 # coeficientes = {
 #     "quartos": abs(0.1612),
