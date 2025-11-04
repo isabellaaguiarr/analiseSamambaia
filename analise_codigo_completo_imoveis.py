@@ -101,13 +101,18 @@ while True:
                 quartos = elem.find_element(By.XPATH, './div[2]/div[2]/div[3]/div[2]').text
             except:
                 quartos = ''
-
+            try: 
+                vaga = elem.find_element(By.XPATH, './div[2]/div[2]/div[3]').text
+            except:
+                vaga = ''
+# Variavel vaga em boleana / se tiver 1 e nao 0 
             # Dicionario do imovel
             imovel = {
                 'endereco': endereco,
                 'preco': preco,
                 'metragem': metragem,
                 'quartos': quartos,
+                'vaga': vaga,
             }
 
             lst_imoveis.append(imovel)
@@ -129,6 +134,9 @@ driver.quit()   # Fechar o robo
 df = pd.DataFrame(lst_imoveis)
 
 # PARTE 2 - Tratando os dados  
+# Trasformando vaga em booleano 
+df['vaga'] = df['vaga'].str.contains(r'\b1\s*VAGA\b|\bVAGA\b', flags=re.IGNORECASE, regex=True).astype(int)
+
 # Convertendo o preço para numero
 df["preco"] = pd.to_numeric(
     df["preco"].str.extract(r"(\d[\d\.,]*)")[0].str.replace(".", "").str.replace(",", "")
@@ -160,7 +168,8 @@ df.replace(r'^\s*$', np.nan, regex=True, inplace=True)
 df = df.drop_duplicates().sort_values(by="preco", ascending=False)
 
 # Salvando em csv 
-df.to_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dados/imoveis_samambaia.csv", index=False, encoding="utf-8")
+# df.to_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dados/imoveis_samambaia.csv", index=False, encoding="utf-8")
+df = pd.read_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dados/imoveis_samambaia.csv")
 print(df)
 
 # PARTE 3 - Transformando os dados em coordenadas 
@@ -215,7 +224,7 @@ df_localizados = pd.read_csv("C:/Users/isabe/Documents/PROVA/analiseImoveis/dado
 
 # PARTE 4 - Limpeza de dados
 # 1. Definindo as colunas relevantes para analise
-colunas_modelo = ["metragem", "quartos", "distancia_metro_km", "preco"]
+colunas_modelo = ["metragem", "quartos", "distancia_metro_km", "preco", "vaga"]
 
 # 2. Limpando novamente a base e convertendo os dados para o formato float
 df_limpo = df_localizados[colunas_modelo + ["endereco", "lat", "lng"]].copy()
@@ -225,6 +234,7 @@ df_limpo["metragem"] = pd.to_numeric(df_limpo["metragem"], errors="coerce")
 df_limpo["quartos"] = pd.to_numeric(df_limpo["quartos"], errors="coerce")
 df_limpo["distancia_metro_km"] = pd.to_numeric(df_limpo["distancia_metro_km"], errors="coerce")
 df_limpo["preco"] = pd.to_numeric(df_limpo["preco"], errors="coerce")
+df_limpo["vaga"] = pd.to_numeric(df_limpo["vaga"], errors="coerce")
 
 # 3. Removendo outliers de preco usando IQR (quartis)
 precos = df_limpo["preco"]
@@ -272,7 +282,7 @@ plt.grid(True)
 plt.show()
 
 # 3. Regressao linear multipla
-X = df_limpo[["metragem", "quartos", "ln_distancia_metro"]]
+X = df_limpo[["metragem", "quartos", "vaga", "ln_distancia_metro"]]
 y = df_limpo["ln_preco"]
 X_const = sm.add_constant(X)
 modelo_multiplo = sm.OLS(y, X_const).fit()
@@ -281,7 +291,7 @@ print(modelo_multiplo.summary())
 
 # 3.1 Regressao linear multipla (Multicolinearidade)
 # Calcula o VIF para cada variavel 
-X_vif = sm.add_constant(df_limpo[["metragem", "quartos", "ln_distancia_metro"]])
+X_vif = sm.add_constant(df_limpo[["metragem", "quartos", "vaga", "ln_distancia_metro"]])
 vif = pd.DataFrame()
 vif["Variável"] = X_vif.columns
 vif["VIF"] = [variance_inflation_factor(X_vif.values, i) for i in range(X_vif.shape[1])]
@@ -291,9 +301,9 @@ print(vif)
 # # 4. Grafico de Importancia das Variaveis
 # ## Coeficientes do modelo (tirados da regressao/coef)
 # coeficientes = {
-#     "metragem": abs(0.0059),
-#     "quartos": abs(0.1808),
-#     "ln_distancia_metro": abs(0.0039)
+#     "quartos": abs(0.1612),
+#     "vaga": abs(0.1490),
+#     "ln_distancia_metro": abs(-0.0087)
 # }
 
 # ## Criando um df ordenado
