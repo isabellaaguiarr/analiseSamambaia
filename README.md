@@ -36,18 +36,18 @@ Extrair dados de imóveis do site [DF Imóveis](https://www.dfimoveis.com.br), g
 
 ### 3. Geocodificação
 - Utiliza a API Nominatim para obter latitude e longitude dos imóveis  
-- Calcula a menor distância até as estações de metrô de Samambaia  
+- Calcula a distância até as estações de metrô de Samambaia  
 
 ### 4. Tratamento Estatístico
 - Remove outliers de preço com base no intervalo interquartil (IQR)  
-- Exclui imóveis com mais de 5 quartos ou com preço acima de R$ 3 milhões  
-- Aplica transformações logarítmicas para normalizar variáveis  
+- Aplica transformações logarítmicas para normalizar as variáveis  
 
 ### 5. Análise Estatística
 - Aplica regressão linear múltipla para prever o preço com base em:
   - Metragem  
   - Número de quartos  
-  - Distância até o metrô  
+  - Distância até o metrô 
+  - Número de vagas  
 - Avalia multicolinearidade entre variáveis explicativas usando VIF (Variance Inflation Factor)
 
 ---
