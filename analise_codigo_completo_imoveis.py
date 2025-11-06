@@ -272,7 +272,7 @@ plt.ylabel("Preço do imóvel (R$)")
 plt.grid(True)
 plt.show()
 
-# 3. Grafico de Barras sobre preco medio por faixa de distancia
+# 3. Grafico de barras sobre preco medio por faixa de distancia
 preco_medio_faixa = df_limpo.groupby("faixa_distancia")["preco"].mean().reset_index()
 plt.figure(figsize=(8, 6))
 sns.barplot(data=preco_medio_faixa, x="faixa_distancia", y="preco", palette="crest")
