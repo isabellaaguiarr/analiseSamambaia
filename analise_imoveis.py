@@ -255,7 +255,7 @@ df_limpo["ln_preco"] = np.log1p(df_limpo["preco"])
 # 1. Histograma da Distribuicao de Precos dos Imoveis
 print("\nGerando Histograma: Distribuição de Preços dos Imóveis...")
 plt.figure(figsize=(10, 6))
-sns.histplot(data=df_limpo, x='preco', bins=30, kde=True, color='ForestGreen')
+sns.histplot(data=df_limpo, x='preco', bins=30, kde=True, color='royalblue')
 plt.title('Distribuição de Preços dos Imóveis em Samambaia')
 plt.xlabel('Preço do Imóvel (R$)')
 plt.ylabel('Contagem')
@@ -265,7 +265,7 @@ plt.show()
 
 # 2. Boxplot por Faixas de Distancia 
 df_limpo["faixa_distancia"] = pd.cut(df_limpo["distancia_metro_km"], bins=[0, 0.5, 1, 2, 5], labels=["<500m", "500m–1km", "1–2km", "2–5km"])
-sns.boxplot(data=df_limpo, x="faixa_distancia", y="preco", color='ForestGreen')
+sns.boxplot(data=df_limpo, x="faixa_distancia", y="preco", color='dodgerblue')
 plt.title("Distribuição de preços por faixa de distância ao metrô")
 plt.xlabel("Faixa de distância ao metrô")
 plt.ylabel("Preço do imóvel (R$)")
